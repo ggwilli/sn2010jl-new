@@ -3,6 +3,7 @@
 """
 This script reads in SN 2010jl data from fits files and text files and
 bins the data and makes several plots.
+Version 1.0
 """
 
 import matplotlib as mpl
