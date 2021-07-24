@@ -326,9 +326,9 @@ print('Number of Lick bins')
 print(lick_num_bins)
 
 """
-This function is defined as the adding errors in quadrature as
-should be done for binning the variance spectra.
-The result is sqrt( (sig_0)^2 + (sig_1)^2 + (sig_2)^2 + ...)
+This function is defined as the adding errors in quadrature as should
+be done for binning the variance spectra.  The result is:
+theResult = sqrt( (sig_0)^2 + (sig_1)^2 + (sig_2)^2 + ...)
 """
 
 def quad(numList):
@@ -339,10 +339,10 @@ def quad(numList):
         return theResult
 
 """
-7/9/2021 - THIS FUNCTION WON'T BE USED, IT WASN'T THE CORRECT CALCULATION.
-This function is defined as the adding variances in inverse quadrature as
-should be done for binning the variance spectra.
-The result is 1.0/sqrt( (1/sig_0)^2 + (1/sig_1)^2 + (1/sig_2)^2 + ...)
+7/9/2021 - This function isn't currently being used.  It's defined as the
+adding variances in inverse quadrature as should be done for binning the
+variance spectra in a variace weighted way.  The result is:
+theResult = 1.0/sqrt( (1/sig_0)^2 + (1/sig_1)^2 + (1/sig_2)^2 + ...)
 """
 
 def inv_quad(numList):
@@ -380,6 +380,18 @@ usum_bin_band2 = []
 qsum_bin_band3 = []
 usum_bin_band3 = []
 
+qsig_flx = []
+usig_flx = []
+qsig_flx_bin = []
+usig_flx_bin = []
+
+qsig_flx_bin_band1 = []
+usig_flx_bin_band1 = []
+qsig_flx_bin_band2 = []
+usig_flx_bin_band2 = []
+qsig_flx_bin_band3 = []
+usig_flx_bin_band3 = []
+
 qsig_bin = []
 usig_bin = []
 
@@ -391,6 +403,7 @@ qsig_bin_band3 = []
 usig_bin_band3 = []
 
 for q_d, u_d, qsum_d, usum_d, qsig_d, usig_d, q_lam, u_lam in zip(q, u, qsum, usum, qsig, usig, q_lambdas, u_lambdas):
+
     Qflx.append(q_d * qsum_d)
     Uflx.append(u_d * usum_d)
     Qflx_bin.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=num_bins)[0])
@@ -399,6 +412,13 @@ for q_d, u_d, qsum_d, usum_d, qsig_d, usig_d, q_lam, u_lam in zip(q, u, qsum, us
     Uflx_bin_edges.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=num_bins)[1])
     Qflx_bin_num.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=num_bins)[2])
     Uflx_bin_num.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=num_bins)[2])
+    Qflx_bin_band1.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band1_range"])[0])
+    Uflx_bin_band1.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band1_range"])[0])
+    Qflx_bin_band2.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band2_range"])[0])
+    Uflx_bin_band2.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band2_range"])[0])
+    Qflx_bin_band3.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band3_range"])[0])
+    Uflx_bin_band3.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band3_range"])[0])
+
     qsum_bin.append(stats.binned_statistic(q_lam, qsum_d, statistic='sum', bins=num_bins)[0])
     usum_bin.append(stats.binned_statistic(u_lam, usum_d, statistic='sum', bins=num_bins)[0])
     qsum_bin_band1.append(stats.binned_statistic(q_lam, qsum_d, statistic='sum', bins=1, range=config["band1_range"])[0])
@@ -407,20 +427,17 @@ for q_d, u_d, qsum_d, usum_d, qsig_d, usig_d, q_lam, u_lam in zip(q, u, qsum, us
     usum_bin_band2.append(stats.binned_statistic(u_lam, usum_d, statistic='sum', bins=1, range=config["band2_range"])[0])
     qsum_bin_band3.append(stats.binned_statistic(q_lam, qsum_d, statistic='sum', bins=1, range=config["band3_range"])[0])
     usum_bin_band3.append(stats.binned_statistic(u_lam, usum_d, statistic='sum', bins=1, range=config["band3_range"])[0])
-    qsig_bin.append(stats.binned_statistic(q_lam, qsig_d, statistic=inv_quad, bins=num_bins)[0])
-    usig_bin.append(stats.binned_statistic(u_lam, usig_d, statistic=inv_quad, bins=num_bins)[0])
-    qsig_bin_band1.append(stats.binned_statistic(q_lam, qsig_d, statistic=inv_quad, bins=1, range=config["band1_range"])[0])
-    usig_bin_band1.append(stats.binned_statistic(u_lam, usig_d, statistic=inv_quad, bins=1, range=config["band1_range"])[0])
-    qsig_bin_band2.append(stats.binned_statistic(q_lam, qsig_d, statistic=inv_quad, bins=1, range=config["band2_range"])[0])
-    usig_bin_band2.append(stats.binned_statistic(u_lam, usig_d, statistic=inv_quad, bins=1, range=config["band2_range"])[0])
-    qsig_bin_band3.append(stats.binned_statistic(q_lam, qsig_d, statistic=inv_quad, bins=1, range=config["band3_range"])[0])
-    usig_bin_band3.append(stats.binned_statistic(u_lam, usig_d, statistic=inv_quad, bins=1, range=config["band3_range"])[0])
-    Qflx_bin_band1.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band1_range"])[0])
-    Uflx_bin_band1.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band1_range"])[0])
-    Qflx_bin_band2.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band2_range"])[0])
-    Uflx_bin_band2.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band2_range"])[0])
-    Qflx_bin_band3.append(stats.binned_statistic(q_lam, (q_d * qsum_d), statistic='sum', bins=1, range=config["band3_range"])[0])
-    Uflx_bin_band3.append(stats.binned_statistic(u_lam, (u_d * usum_d), statistic='sum', bins=1, range=config["band3_range"])[0])
+
+    qsig_flx.append(qsig_d * qsum_d) 
+    usig_flx.append(usig_d * usum_d) 
+    qsig_flx_bin.append(stats.binned_statistic(q_lam, (qsig_d * qsum_d), statistic=quad, bins=num_bins)[0])
+    usig_flx_bin.append(stats.binned_statistic(u_lam, (usig_d * usum_d), statistic=quad, bins=num_bins)[0])
+    qsig_flx_bin_band1.append(stats.binned_statistic(q_lam, (qsig_d * qsum_d), statistic=quad, bins=1, range=config["band1_range"])[0])
+    usig_flx_bin_band1.append(stats.binned_statistic(u_lam, (usig_d * usum_d), statistic=quad, bins=1, range=config["band1_range"])[0])
+    qsig_flx_bin_band2.append(stats.binned_statistic(q_lam, (qsig_d * qsum_d), statistic=quad, bins=1, range=config["band2_range"])[0])
+    usig_flx_bin_band2.append(stats.binned_statistic(u_lam, (usig_d * usum_d), statistic=quad, bins=1, range=config["band2_range"])[0])
+    qsig_flx_bin_band3.append(stats.binned_statistic(q_lam, (qsig_d * qsum_d), statistic=quad, bins=1, range=config["band3_range"])[0])
+    usig_flx_bin_band3.append(stats.binned_statistic(u_lam, (usig_d * usum_d), statistic=quad, bins=1, range=config["band3_range"])[0])
 
 # Redefine the list of vectors (or arrays) into a numpy arrays.
 Qflx = np.asarray(Qflx,dtype=object)
@@ -431,6 +448,13 @@ Qflx_bin_edges = np.asarray(Qflx_bin_edges,dtype=object)
 Uflx_bin_edges = np.asarray(Uflx_bin_edges,dtype=object)
 Qflx_bin_num = np.asarray(Qflx_bin_num,dtype=object)
 Uflx_bin_num = np.asarray(Uflx_bin_num,dtype=object)
+Qflx_bin_band1 = np.asarray(Qflx_bin_band1)
+Uflx_bin_band1 = np.asarray(Uflx_bin_band1)
+Qflx_bin_band2 = np.asarray(Qflx_bin_band2)
+Uflx_bin_band2 = np.asarray(Uflx_bin_band2)
+Qflx_bin_band3 = np.asarray(Qflx_bin_band3)
+Uflx_bin_band3 = np.asarray(Uflx_bin_band3)
+
 qsum_bin = np.asarray(qsum_bin)
 usum_bin = np.asarray(usum_bin)
 qsum_bin_band1 = np.asarray(qsum_bin_band1)
@@ -439,20 +463,17 @@ qsum_bin_band2 = np.asarray(qsum_bin_band2)
 usum_bin_band2 = np.asarray(usum_bin_band2)
 qsum_bin_band3 = np.asarray(qsum_bin_band3)
 usum_bin_band3 = np.asarray(usum_bin_band3)
-qsig_bin = np.asarray(qsig_bin)
-usig_bin = np.asarray(usig_bin)
-qsig_bin_band1 = np.asarray(qsig_bin_band1)
-usig_bin_band1 = np.asarray(usig_bin_band1)
-qsig_bin_band2 = np.asarray(qsig_bin_band2)
-usig_bin_band2 = np.asarray(usig_bin_band2)
-qsig_bin_band3 = np.asarray(qsig_bin_band3)
-usig_bin_band3 = np.asarray(usig_bin_band3)
-Qflx_bin_band1 = np.asarray(Qflx_bin_band1)
-Uflx_bin_band1 = np.asarray(Uflx_bin_band1)
-Qflx_bin_band2 = np.asarray(Qflx_bin_band2)
-Uflx_bin_band2 = np.asarray(Uflx_bin_band2)
-Qflx_bin_band3 = np.asarray(Qflx_bin_band3)
-Uflx_bin_band3 = np.asarray(Uflx_bin_band3)
+
+qsig_flx = np.asarray(qsig_flx)
+usig_flx = np.asarray(usig_flx)
+qsig_flx_bin = np.asarray(qsig_flx_bin)
+usig_flx_bin = np.asarray(usig_flx_bin)
+qsig_flx_bin_band1 = np.asarray(qsig_flx_bin_band1)
+usig_flx_bin_band1 = np.asarray(usig_flx_bin_band1)
+qsig_flx_bin_band2 = np.asarray(qsig_flx_bin_band2)
+usig_flx_bin_band2 = np.asarray(usig_flx_bin_band2)
+qsig_flx_bin_band3 = np.asarray(qsig_flx_bin_band3)
+usig_flx_bin_band3 = np.asarray(usig_flx_bin_band3)
 
 lick_Qflx = []
 lick_Uflx = []
@@ -468,10 +489,24 @@ lick_Qflx_bin_edges = []
 lick_Uflx_bin_edges = []
 lick_Qflx_bin_num = []
 lick_Uflx_bin_num = []
+
 lick_flux_big_bin = []
 lick_flux_big_bin_band1 = []
 lick_flux_big_bin_band2 = []
 lick_flux_big_bin_band3 = []
+
+lick_qsig_flx = []
+lick_usig_flx = []
+lick_qsig_flx_bin = []
+lick_usig_flx_bin = []
+
+lick_qsig_flx_bin_band1 = []
+lick_usig_flx_bin_band1 = []
+lick_qsig_flx_bin_band2 = []
+lick_usig_flx_bin_band2 = []
+lick_qsig_flx_bin_band3 = []
+lick_usig_flx_bin_band3 = []
+
 lick_qsig_bin = []
 lick_usig_bin = []
 lick_qsig_bin_band1 = []
@@ -482,6 +517,7 @@ lick_qsig_bin_band3 = []
 lick_usig_bin_band3 = []
 
 for l_q_d, l_u_d, l_qsig_d, l_usig_d, l_flux_big_d, l_lam in zip(lick_q, lick_u, lick_qsig, lick_usig, lick_flux_big, lick_lambdas):
+
     lick_Qflx.append(l_q_d * l_flux_big_d)
     lick_Uflx.append(l_u_d * l_flux_big_d)
     lick_Qflx_bin.append(stats.binned_statistic(l_lam, (l_q_d * l_flux_big_d), statistic='sum', bins=lick_num_bins)[0])
@@ -490,25 +526,29 @@ for l_q_d, l_u_d, l_qsig_d, l_usig_d, l_flux_big_d, l_lam in zip(lick_q, lick_u,
     lick_Uflx_bin_edges.append(stats.binned_statistic(l_lam, (l_u_d * l_flux_big_d), statistic='sum', bins=lick_num_bins)[1])
     lick_Qflx_bin_num.append(stats.binned_statistic(l_lam, (l_q_d * l_flux_big_d), statistic='sum', bins=lick_num_bins)[2])
     lick_Uflx_bin_num.append(stats.binned_statistic(l_lam, (l_u_d * l_flux_big_d), statistic='sum', bins=lick_num_bins)[2])
-    lick_flux_big_bin.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=lick_num_bins)[0])
-    lick_flux_big_bin_band1.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band1_range"])[0])
-    lick_flux_big_bin_band2.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band2_range"])[0])
-    lick_flux_big_bin_band3.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band3_range"])[0])
-    lick_qsig_bin.append(stats.binned_statistic(l_lam, l_qsig_d, statistic=inv_quad, bins=lick_num_bins)[0])
-    lick_usig_bin.append(stats.binned_statistic(l_lam, l_usig_d, statistic=inv_quad, bins=lick_num_bins)[0])
-    lick_qsig_bin_band1.append(stats.binned_statistic(l_lam, l_qsig_d, statistic=inv_quad, bins=1, range=config["band1_range"])[0])
-    #lick_qsig_bin_band1.append(stats.binned_statistic(l_lam, l_qsig_d, statistic='sum', bins=1, range=config["band1_range"])[0])
-    lick_usig_bin_band1.append(stats.binned_statistic(l_lam, l_usig_d, statistic=inv_quad, bins=1, range=config["band1_range"])[0])
-    lick_qsig_bin_band2.append(stats.binned_statistic(l_lam, l_qsig_d, statistic=inv_quad, bins=1, range=config["band2_range"])[0])
-    lick_usig_bin_band2.append(stats.binned_statistic(l_lam, l_usig_d, statistic=inv_quad, bins=1, range=config["band2_range"])[0])
-    lick_qsig_bin_band3.append(stats.binned_statistic(l_lam, l_qsig_d, statistic=inv_quad, bins=1, range=config["band3_range"])[0])
-    lick_usig_bin_band3.append(stats.binned_statistic(l_lam, l_usig_d, statistic=inv_quad, bins=1, range=config["band3_range"])[0])
     lick_Qflx_bin_band1.append(stats.binned_statistic(l_lam, (l_q_d * l_flux_big_d), statistic='sum', bins=1, range=config["band1_range"])[0])
     lick_Uflx_bin_band1.append(stats.binned_statistic(l_lam, (l_u_d * l_flux_big_d), statistic='sum', bins=1, range=config["band1_range"])[0])
     lick_Qflx_bin_band2.append(stats.binned_statistic(l_lam, (l_q_d * l_flux_big_d), statistic='sum', bins=1, range=config["band2_range"])[0])
     lick_Uflx_bin_band2.append(stats.binned_statistic(l_lam, (l_u_d * l_flux_big_d), statistic='sum', bins=1, range=config["band2_range"])[0])
     lick_Qflx_bin_band3.append(stats.binned_statistic(l_lam, (l_q_d * l_flux_big_d), statistic='sum', bins=1, range=config["band3_range"])[0])
     lick_Uflx_bin_band3.append(stats.binned_statistic(l_lam, (l_u_d * l_flux_big_d), statistic='sum', bins=1, range=config["band3_range"])[0])
+
+    lick_flux_big_bin.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=lick_num_bins)[0])
+    lick_flux_big_bin_band1.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band1_range"])[0])
+    lick_flux_big_bin_band2.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band2_range"])[0])
+    lick_flux_big_bin_band3.append(stats.binned_statistic(l_lam, l_flux_big_d, statistic='sum', bins=1, range=config["band3_range"])[0])
+
+    lick_qsig_flx.append(l_qsig_d * l_flux_big_d)
+    lick_usig_flx.append(l_usig_d * l_flux_big_d)
+    lick_qsig_flx_bin.append(stats.binned_statistic(l_lam, (l_qsig_d * l_flux_big_d), statistic=quad, bins=lick_num_bins)[0])
+    lick_usig_flx_bin.append(stats.binned_statistic(l_lam, (l_usig_d * l_flux_big_d), statistic=quad, bins=lick_num_bins)[0])
+    lick_qsig_flx_bin_band1.append(stats.binned_statistic(l_lam, (l_qsig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band1_range"])[0])
+    #lick_qsig_flx_bin_band1.append(stats.binned_statistic(l_lam, (l_qsig_d * l_flux_big_d), statistic='sum', bins=1, range=config["band1_range"])[0])
+    lick_usig_flx_bin_band1.append(stats.binned_statistic(l_lam, (l_usig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band1_range"])[0])
+    lick_qsig_flx_bin_band2.append(stats.binned_statistic(l_lam, (l_qsig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band2_range"])[0])
+    lick_usig_flx_bin_band2.append(stats.binned_statistic(l_lam, (l_usig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band2_range"])[0])
+    lick_qsig_flx_bin_band3.append(stats.binned_statistic(l_lam, (l_qsig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band3_range"])[0])
+    lick_usig_flx_bin_band3.append(stats.binned_statistic(l_lam, (l_usig_d * l_flux_big_d), statistic=quad, bins=1, range=config["band3_range"])[0])
 
 # Redefine the list of vectors (or arrays) into a numpy arrays.
 lick_Qflx = np.asarray(lick_Qflx)
@@ -519,21 +559,23 @@ lick_Qflx_bin_edges = np.asarray(lick_Qflx_bin_edges)
 lick_Uflx_bin_edges = np.asarray(lick_Uflx_bin_edges)
 lick_Qflx_bin_num = np.asarray(lick_Qflx_bin_num)
 lick_Uflx_bin_num = np.asarray(lick_Uflx_bin_num)
-lick_flux_big_bin = np.asarray(lick_flux_big_bin)
-lick_qsig_bin = np.asarray(lick_qsig_bin)
-lick_usig_bin = np.asarray(lick_usig_bin)
-lick_qsig_bin_band1 = np.asarray(lick_qsig_bin_band1)
-lick_usig_bin_band1 = np.asarray(lick_usig_bin_band1)
-lick_qsig_bin_band2 = np.asarray(lick_qsig_bin_band2)
-lick_usig_bin_band2 = np.asarray(lick_usig_bin_band2)
-lick_qsig_bin_band3 = np.asarray(lick_qsig_bin_band3)
-lick_usig_bin_band3 = np.asarray(lick_usig_bin_band3)
 lick_Qflx_bin_band1 = np.asarray(lick_Qflx_bin_band1)
 lick_Uflx_bin_band1 = np.asarray(lick_Uflx_bin_band1)
 lick_Qflx_bin_band2 = np.asarray(lick_Qflx_bin_band2)
 lick_Uflx_bin_band2 = np.asarray(lick_Uflx_bin_band2)
 lick_Qflx_bin_band3 = np.asarray(lick_Qflx_bin_band3)
 lick_Uflx_bin_band3 = np.asarray(lick_Uflx_bin_band3)
+
+lick_flux_big_bin = np.asarray(lick_flux_big_bin)
+
+lick_qsig_flx_bin = np.asarray(lick_qsig_flx_bin)
+lick_usig_flx_bin = np.asarray(lick_usig_flx_bin)
+lick_qsig_flx_bin_band1 = np.asarray(lick_qsig_flx_bin_band1)
+lick_usig_flx_bin_band1 = np.asarray(lick_usig_flx_bin_band1)
+lick_qsig_flx_bin_band2 = np.asarray(lick_qsig_flx_bin_band2)
+lick_usig_flx_bin_band2 = np.asarray(lick_usig_flx_bin_band2)
+lick_qsig_flx_bin_band3 = np.asarray(lick_qsig_flx_bin_band3)
+lick_usig_flx_bin_band3 = np.asarray(lick_usig_flx_bin_band3)
 
 """
 We can't divide multiple lists but we can use list comprehension to separate
@@ -551,6 +593,16 @@ q_bin_band2 = np.divide(Qflx_bin_band2,qsum_bin_band2)
 u_bin_band2 = np.divide(Uflx_bin_band2,usum_bin_band2)
 q_bin_band3 = np.divide(Qflx_bin_band3,qsum_bin_band3)
 u_bin_band3 = np.divide(Uflx_bin_band3,usum_bin_band3)
+
+qsig_bin = np.divide(qsig_flx_bin,qsum_bin)
+usig_bin = np.divide(usig_flx_bin,usum_bin)
+qsig_bin_band1 = np.divide(qsig_flx_bin_band1,qsum_bin_band1)
+usig_bin_band1 = np.divide(usig_flx_bin_band1,usum_bin_band1)
+qsig_bin_band2 = np.divide(qsig_flx_bin_band2,qsum_bin_band2)
+usig_bin_band2 = np.divide(usig_flx_bin_band2,usum_bin_band2)
+qsig_bin_band3 = np.divide(qsig_flx_bin_band3,qsum_bin_band3)
+usig_bin_band3 = np.divide(usig_flx_bin_band3,usum_bin_band3)
+
 lick_q_bin = np.divide(lick_Qflx_bin,lick_flux_big_bin)
 lick_u_bin = np.divide(lick_Uflx_bin,lick_flux_big_bin)
 lick_q_bin_band1 = np.divide(lick_Qflx_bin_band1,lick_flux_big_bin_band1)
@@ -566,6 +618,15 @@ lick_u_bin_band3 = np.divide(lick_Uflx_bin_band3,lick_flux_big_bin_band3)
 #u_bin_band1 = [(ai * 1.0)/bi for ai,bi in zip(Uflx_bin_band1,usum_bin_band1)]
 #lick_q_bin = [(ai * 1.0)/bi for ai,bi in zip(lick_Qflx_bin,lick_flux_big_bin)]
 #lick_u_bin = [(ai * 1.0)/bi for ai,bi in zip(lick_Uflx_bin,lick_flux_big_bin)]
+
+lick_qsig_bin = np.divide(lick_qsig_flx_bin,lick_flux_big_bin)
+lick_usig_bin = np.divide(lick_usig_flx_bin,lick_flux_big_bin)
+lick_qsig_bin_band1 = np.divide(lick_qsig_flx_bin_band1,lick_flux_big_bin_band1)
+lick_usig_bin_band1 = np.divide(lick_usig_flx_bin_band1,lick_flux_big_bin_band1)
+lick_qsig_bin_band2 = np.divide(lick_qsig_flx_bin_band2,lick_flux_big_bin_band2)
+lick_usig_bin_band2 = np.divide(lick_usig_flx_bin_band2,lick_flux_big_bin_band2)
+lick_qsig_bin_band3 = np.divide(lick_qsig_flx_bin_band3,lick_flux_big_bin_band3)
+lick_usig_bin_band3 = np.divide(lick_usig_flx_bin_band3,lick_flux_big_bin_band3)
 
 q_isp = np.subtract(q,config["q_isp"]/100.0)
 u_isp = np.subtract(u,config["u_isp"]/100.0)
